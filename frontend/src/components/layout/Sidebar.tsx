@@ -80,7 +80,12 @@ export default function Sidebar() {
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
         {!collapsed && (
-          <div className="text-xl font-bold text-indigo-600">SRMT</div>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+              SR
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">SRMT</span>
+          </div>
         )}
         <button 
           onClick={() => setCollapsed(!collapsed)}

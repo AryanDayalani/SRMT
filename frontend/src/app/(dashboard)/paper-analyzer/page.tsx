@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import api from '@/services/api';
+import ReactMarkdown from 'react-markdown';
 
 export default function PaperAnalyzerPage() {
   const [text, setText] = useState('');
@@ -12,7 +13,12 @@ export default function PaperAnalyzerPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+      setText(''); // Clear text when file is selected
     }
+  };
+
+  const clearFile = () => {
+    setFile(null);
   };
 
   const handleAnalyze = async () => {
@@ -23,13 +29,12 @@ export default function PaperAnalyzerPage() {
 
     try {
         setIsLoading(true);
+        setAnalysis('');
         
         let response;
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-            // If text is also there, maybe append it? ignoring text if file exists for now or vice versa
-            // Let's assume file takes precedence if both
             response = await api.post('/analysis', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -50,9 +55,10 @@ export default function PaperAnalyzerPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">AI Paper Analyzer (Powered by Groq)</h1>
+      <h1 className="text-2xl font-semibold text-gray-900">AI Paper Analyzer</h1>
+      <p className="text-gray-600">Powered by Llama 3.3 70B via Groq</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Section */}
           <div className="bg-white shadow rounded-lg p-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -71,12 +77,22 @@ export default function PaperAnalyzerPage() {
                       file:bg-indigo-50 file:text-indigo-700
                       hover:file:bg-indigo-100"
                  />
-                 {file && <p className="mt-1 text-sm text-green-600">Selected: {file.name}</p>}
+                 {file && (
+                   <div className="mt-2 flex items-center gap-2">
+                     <span className="text-sm text-green-600">📄 {file.name}</span>
+                     <button 
+                       onClick={clearFile}
+                       className="text-xs text-red-500 hover:text-red-700"
+                     >
+                       (Remove)
+                     </button>
+                   </div>
+                 )}
               </div>
 
               <textarea
-                  className="w-full h-80 p-4 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 bg-white"
-                  placeholder={file ? "File selected. Text input will be ignored." : "Paste the text of the research paper here..."}
+                  className="w-full h-72 p-4 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 bg-white"
+                  placeholder={file ? "File selected. Text input is disabled." : "Paste the abstract or full text of the research paper here..."}
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   disabled={!!file}
@@ -85,7 +101,7 @@ export default function PaperAnalyzerPage() {
                   <button
                       onClick={handleAnalyze}
                       disabled={isLoading}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                      className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                   >
                       {isLoading ? (
                           <>
@@ -95,21 +111,22 @@ export default function PaperAnalyzerPage() {
                               </svg>
                               Analyzing...
                           </>
-                      ) : 'Analyze Text'}
+                      ) : '🔍 Analyze Paper'}
                   </button>
               </div>
           </div>
 
           {/* Output Section */}
-          <div className="bg-white shadow rounded-lg p-6 overflow-y-auto max-h-[600px]">
+          <div className="bg-white shadow rounded-lg p-6 overflow-y-auto max-h-[700px]">
               <h2 className="text-lg font-medium text-gray-900 mb-4">Analysis Result</h2>
               {analysis ? (
-                  <div className="prose prose-sm max-w-none">
-                      <pre className="whitespace-pre-wrap font-sans text-gray-700">{analysis}</pre>
+                  <div className="prose prose-sm max-w-none text-black prose-headings:text-black prose-headings:font-semibold prose-p:text-black prose-li:text-black prose-strong:text-black prose-table:text-black prose-td:text-black prose-th:text-black prose-a:text-indigo-600 [&_table]:w-full [&_table]:text-sm [&_th]:px-2 [&_th]:py-1 [&_td]:px-2 [&_td]:py-1 [&_table]:border-collapse [&_th]:border [&_th]:border-gray-300 [&_td]:border [&_td]:border-gray-200 [&_th]:bg-gray-50">
+                      <ReactMarkdown>{analysis}</ReactMarkdown>
                   </div>
               ) : (
                   <div className="text-center text-gray-500 py-20">
-                      <p>Run analysis to see the results here.</p>
+                      <div className="text-4xl mb-4">📄</div>
+                      <p>Upload a paper or paste text to see the AI analysis.</p>
                   </div>
               )}
           </div>
