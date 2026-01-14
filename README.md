@@ -184,6 +184,9 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 
 ## 👨‍💻 Author
 
+**Lucky Gupta**
+- GitHub: [@LuckyGupta1712](https://github.com/LuckyGupta1712)
+
 **Aryan Dayalani**
 - GitHub: [@AryanDayalani](https://github.com/AryanDayalani)
 
